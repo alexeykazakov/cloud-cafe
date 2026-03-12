@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Cafe ☁️</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <img src="/images/logo.jpg" alt="Cloud Cafe" class="header-logo">
+        </div>
+    </header>
+
+    <main>
+        <div id="error-banner" class="error-banner hidden">
+            <div class="error-icon">⛈️</div>
+            <div class="error-text">
+                <strong>Cloud Cafe is temporarily closed</strong>
+                <p>We're experiencing some turbulence. Please try again soon.</p>
+            </div>
+        </div>
+
+        <section id="menu-section">
+            <h2>Our Menu</h2>
+            <div id="menu-grid" class="menu-grid">
+                <div class="loading">Loading drinks...</div>
+            </div>
+        </section>
+
+        <section id="orders-section">
+            <h2>Recent Orders</h2>
+            <div id="orders-list" class="orders-list">
+                <p class="empty-state">No orders yet. Be the first! ✨</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Order Modal -->
+    <div id="order-modal" class="modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <h3>Place Your Order</h3>
+            <p id="modal-drink-name" class="modal-drink-name"></p>
+            <form id="order-form">
+                <input type="hidden" id="order-drink-id">
+                <label for="customer-name">Your Name</label>
+                <input type="text" id="customer-name" placeholder="Enter your name" required autocomplete="off">
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Order Now ☕</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="toast" class="toast hidden">
+        <span id="toast-message"></span>
+    </div>
+
+    <footer>
+        <p>Cloud Cafe &mdash; Powered by dreams and good infrastructure</p>
+    </footer>
+
+    <script src="/app.js"></script>
+</body>
+</html>

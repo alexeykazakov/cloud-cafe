@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: mirror.gcr.io/library/postgres:16-alpine
+    environment:
+      POSTGRES_USER: cloudcafe
+      POSTGRES_PASSWORD: cloudcafe
+      POSTGRES_DB: cloudcafe
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cloudcafe"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: "postgres://cloudcafe:cloudcafe@postgres:5432/cloudcafe?sslmode=disable"
+      PORT: "3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
