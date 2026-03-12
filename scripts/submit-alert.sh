@@ -1,20 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TARSY_URL="${1:-}"
-
-if [[ -z "$TARSY_URL" ]]; then
-    echo "Usage: $0 <TARSY_URL>"
-    echo ""
-    echo "Example: $0 https://tarsy.apps.cluster.example.com"
-    exit 1
-fi
+TARSY_URL="${1:-http://localhost:8080}"
 
 # Strip trailing slash
 TARSY_URL="${TARSY_URL%/}"
 
 ALERT_PAYLOAD='{
-  "alert_type": "Orchestrator Investigation - Anthropic",
+  "alert_type": "Incident Investigation",
   "data": "CRITICAL: Pods in namespace cloud-cafe-prod are in CrashLoopBackOff. Application: cloud-cafe-api. Restarts: 5+. Duration: 10m."
 }'
 

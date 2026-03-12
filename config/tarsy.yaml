@@ -1,0 +1,76 @@
+# TARSy Configuration — Cloud Cafe Demo
+#
+# Copy this file to your TARSy repo: deploy/config/tarsy.yaml
+# This is a minimal config with only the chain needed for the demo.
+
+system:
+  dashboard_url: "http://localhost:5173"
+
+queue:
+  max_concurrent_sessions: 2
+
+defaults:
+  llm_provider: "google-default"
+  max_iterations: 30
+  llm_backend: "google-native"
+  success_policy: "any"
+  alert_type: "Incident Investigation"
+  scoring_enabled: true
+  fallback_providers:
+    - provider: "gemini-3-flash"
+      backend: "google-native"
+    - provider: "gemini-3.1-pro"
+      backend: "google-native"
+
+mcp_servers:
+  kubernetes-server:
+    transport:
+      type: "http"
+      url: "http://localhost:8888/mcp"
+      timeout: 30
+
+agent_chains:
+  orchestrator-investigation-anthropic:
+    alert_types: ["Incident Investigation"]
+    description: "Deep orchestrated investigation with custom overrides"
+    stages:
+      - name: "orchestrate"
+        agents:
+          - name: "Orchestrator"
+            llm_provider: "vertexai-anthropic"
+            llm_backend: "langchain"
+            mcp_servers: [kubernetes-server]
+            sub_agents:
+              - name: KubernetesAgent
+                llm_provider: "vertexai-anthropic"
+                llm_backend: "langchain"
+              - name: WebResearcher
+                llm_provider: "gemini-3-flash"
+                llm_backend: "google-native"
+              - name: CodeExecutor
+                llm_provider: "gemini-3-flash"
+                llm_backend: "google-native"
+              - name: GeneralWorker
+                mcp_servers: [kubernetes-server]
+                llm_provider: "gemini-3-flash"
+                llm_backend: "google-native"
+          - name: "Orchestrator"
+            llm_provider: "gemini-3.1-pro"
+            llm_backend: "google-native"
+            sub_agents:
+              - name: KubernetesAgent
+                llm_provider: "gemini-3.1-pro"
+                llm_backend: "google-native"
+              - name: WebResearcher
+                llm_provider: "gemini-3-flash"
+                llm_backend: "google-native"
+              - name: CodeExecutor
+                llm_provider: "gemini-3-flash"
+                llm_backend: "google-native"
+              - name: GeneralWorker
+                mcp_servers: [kubernetes-server]
+                llm_provider: "gemini-3-flash"
+                llm_backend: "google-native"
+        synthesis:
+          llm_backend: "langchain"
+          llm_provider: "vertexai-anthropic"

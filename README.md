@@ -30,7 +30,78 @@ Users browse fantasy drinks and place orders. A deliberately injected failure cr
 
 - `oc login` to an OpenShift cluster
 - Cluster can pull from `quay.io` and `mirror.gcr.io`
-- TARSy running and reachable (for the investigation step)
+- TARSy running locally (see setup below)
+
+## Setting Up TARSy
+
+TARSy runs locally on your machine and connects to the OpenShift cluster via `oc login`.
+
+### 1. Clone and enter the TARSy repo
+
+```bash
+git clone https://github.com/codeready-toolchain/tarsy.git
+cd tarsy
+```
+
+### 2. Configure environment
+
+```bash
+cp deploy/config/.env.example deploy/config/.env
+```
+
+Edit `deploy/config/.env` and set the required keys:
+
+```
+GOOGLE_API_KEY=<your-google-api-key>
+GOOGLE_CLOUD_PROJECT=<your-gcp-project-id>
+GOOGLE_CLOUD_LOCATION=us-central1
+```
+
+The `orchestrator-investigation-anthropic` chain uses Vertex AI Anthropic and Gemini models, so both Google Cloud and API key access are needed.
+
+### 3. Copy the demo tarsy.yaml
+
+This repo provides a minimal `tarsy.yaml` pre-configured with only the chain needed for the demo:
+
+```bash
+cp <path-to-cloud-cafe>/config/tarsy.yaml deploy/config/tarsy.yaml
+```
+
+This configures:
+- `kubernetes-server` MCP via HTTP on `localhost:8888`
+- The `Incident Investigation` chain with dual orchestrators (Anthropic + Gemini) and synthesis
+
+### 4. Login to OpenShift
+
+```bash
+oc login <your-cluster-api-url>
+```
+
+The Kubernetes MCP server uses your local kubeconfig to access the cluster. Make sure the logged-in user has read access to the `cloud-cafe-prod` namespace.
+
+### 5. Start the Kubernetes MCP server
+
+TARSy connects to the [kubernetes-mcp-server](https://github.com/containers/kubernetes-mcp-server) over HTTP. Run it in a separate terminal:
+
+```bash
+npx -y kubernetes-mcp-server@latest --port 8888
+```
+
+This starts the MCP server in Streamable HTTP mode at `http://localhost:8888/mcp`, which matches the `tarsy.yaml` config. It uses your current kubeconfig context (set by `oc login`) to talk to the cluster.
+
+### 6. Start TARSy
+
+```bash
+make dev
+```
+
+This starts all components:
+- PostgreSQL (TARSy's own DB) on `localhost:5432`
+- LLM service on `localhost:50051`
+- Go backend on `localhost:8080`
+- Dashboard on `localhost:5173`
+
+Open **http://localhost:5173** to verify the dashboard is running.
 
 ## Demo Flow
 
@@ -60,7 +131,7 @@ The cascade:
 ### Step 3 — Submit alert to TARSy
 
 ```bash
-./scripts/submit-alert.sh https://tarsy.apps.your-cluster.example.com
+./scripts/submit-alert.sh
 ```
 
 Sends a terse alert to TARSy's API:
@@ -70,7 +141,7 @@ CRITICAL: Pods in namespace cloud-cafe-prod are in CrashLoopBackOff.
 Application: cloud-cafe-api. Restarts: 5+. Duration: 10m.
 ```
 
-TARSy's `orchestrator-investigation-anthropic` chain dispatches sub-agents that trace the failure across pods, events, and quota — arriving at the root cause.
+TARSy's `Incident Investigation` chain dispatches sub-agents that trace the failure across pods, events, and quota — arriving at the root cause.
 
 ### Step 4 — Follow TARSy's recommendations
 
@@ -139,6 +210,8 @@ cloud-cafe/
 │   ├── nginx.conf        # Reverse proxy config
 │   ├── images/           # Drink images
 │   └── Dockerfile
+├── config/
+│   └── tarsy.yaml        # TARSy config for the demo
 ├── k8s/
 │   ├── 00-namespace.yaml
 │   ├── 01-resource-quota.yaml
