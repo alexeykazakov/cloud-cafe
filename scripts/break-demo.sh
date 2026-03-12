@@ -19,6 +19,10 @@ oc patch deployment postgres -n "$NAMESPACE" -p '{
             "requests": {
               "memory": "1Gi",
               "cpu": "200m"
+            },
+            "limits": {
+              "memory": "2Gi",
+              "cpu": "500m"
             }
           }
         }]
