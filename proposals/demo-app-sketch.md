@@ -100,7 +100,7 @@ All scripts live in the Cloud Cafe GitHub repo.
 
 ## Implementation Plan
 
-### Phase 1: Build the Application
+### Phase 1: Build the Application - DONE
 
 Get Cloud Cafe running locally as a real working app.
 
@@ -127,7 +127,7 @@ Get Cloud Cafe running locally as a real working app.
 
 **Done when**: the app runs locally via docker-compose, you can browse the menu, place an order, and see it reflected.
 
-### Phase 2: Containerize & Publish
+### Phase 2: Containerize & Publish - DONE
 
 - Dockerfile for backend (multi-stage Go build)
 - Dockerfile for frontend (nginx + static files)

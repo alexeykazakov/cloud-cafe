@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: cloud-cafe-prod
+  labels:
+    app: backend
+    app.kubernetes.io/part-of: cloud-cafe
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: cloud-cafe-prod
+  labels:
+    app: backend
+    app.kubernetes.io/part-of: cloud-cafe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: quay.io/alexeykazakov/cloud-cafe-backend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              value: "postgres://cloudcafe:cloudcafe@postgres:5432/cloudcafe?sslmode=disable"
+            - name: PORT
+              value: "3000"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3

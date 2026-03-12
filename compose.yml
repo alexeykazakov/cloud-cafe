@@ -14,6 +14,7 @@ services:
       retries: 10
 
   backend:
+    image: quay.io/alexeykazakov/cloud-cafe-backend:latest
     build: ./backend
     environment:
       DATABASE_URL: "postgres://cloudcafe:cloudcafe@postgres:5432/cloudcafe?sslmode=disable"
@@ -23,6 +24,7 @@ services:
         condition: service_healthy
 
   frontend:
+    image: quay.io/alexeykazakov/cloud-cafe-frontend:latest
     build: ./frontend
     ports:
       - "8080:8080"

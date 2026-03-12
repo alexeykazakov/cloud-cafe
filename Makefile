@@ -1,6 +1,10 @@
 COMPOSE := podman-compose
 
-.PHONY: build up down restart logs ps clean
+REGISTRY  := quay.io/alexeykazakov
+BACKEND   := $(REGISTRY)/cloud-cafe-backend:latest
+FRONTEND  := $(REGISTRY)/cloud-cafe-frontend:latest
+
+.PHONY: build up down restart logs ps clean push push-backend push-frontend
 
 build:
 	$(COMPOSE) build --no-cache
@@ -23,3 +27,13 @@ ps:
 clean: down
 	$(COMPOSE) down -v
 	podman rmi -f cloud-cafe_backend cloud-cafe_frontend 2>/dev/null || true
+
+push: push-backend push-frontend
+
+push-backend:
+	podman tag localhost/cloud-cafe_backend:latest $(BACKEND)
+	podman push $(BACKEND)
+
+push-frontend:
+	podman tag localhost/cloud-cafe_frontend:latest $(FRONTEND)
+	podman push $(FRONTEND)

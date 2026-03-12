@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: cloud-cafe-quota
+  namespace: cloud-cafe-prod
+spec:
+  hard:
+    requests.cpu: "500m"
+    requests.memory: "512Mi"
